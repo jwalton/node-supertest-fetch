@@ -1,5 +1,7 @@
 # supertest-fetch
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jwalton/node-supertest-fetch.svg)](https://greenkeeper.io/)
+
 A typescript friendly alternative to Supertest, backed by node-fetch
 
 ## What is it?
