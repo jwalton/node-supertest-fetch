@@ -42,12 +42,12 @@ export function makeFetch(server: http.Server) {
     if(!server || !server.listen || !server.address || !server.close) {
         throw new Error("Expected server");
     }
-    const pServer = Server.create(server);
 
     return function fetch(
         url: string | nodeFetch.Request,
         init?: nodeFetch.RequestInit
     ) {
+        const pServer = Server.create(server);
         return new Test(pServer, url, init);
     };
 }

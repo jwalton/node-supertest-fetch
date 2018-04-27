@@ -157,6 +157,24 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
+        it('should recycle a server', async function() {
+            const fetch = makeFetch(this.server);
+
+            await fetch('/hello')
+                .expectStatus(200)
+                .expectHeader('content-type', 'application/json')
+                .expectBody({greeting: "Hello!"});
+
+            expect(this.closed, 'should close the server').to.equal(1);
+
+            await fetch('/hello')
+                .expectStatus(200)
+                .expectHeader('content-type', 'application/json')
+                .expectBody({greeting: "Hello!"});
+
+            expect(this.closed, 'should close the server').to.equal(2);
+        });
+
     });
 
     describe('server', function() {
@@ -165,6 +183,8 @@ describe('supertest-fetch', function() {
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({greeting: "Hello!"});
+
+            expect(this.closed, 'should close the server').to.equal(1);
 
             await fetch(this.server, '/hello')
                 .expectStatus(200)
