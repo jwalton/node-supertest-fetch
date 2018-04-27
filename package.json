@@ -1,0 +1,66 @@
+{
+  "name": "supertest-fetch",
+  "version": "1.0.0",
+  "description": "Supertest with WHAT-WG fetch like interface.",
+  "main": "lib/index.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "lib/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "test": "npm run build && npm run test:lint && npm run test:unittest",
+    "build": "tsc",
+    "clean": "rm -rf lib types coverage",
+    "test:unittest": "tsc -p test && nyc mocha 'test/**/*.@(ts|js)'",
+    "test:lint": "npm run test:lint:source && npm run test:lint:markdown && npm run test:lint:tests",
+    "test:lint:source": "tslint -c tslint.json -t stylish 'src/**/*.ts'",
+    "test:lint:tests": "tslint -c test/tslint.json -t stylish 'test/**/*.ts'",
+    "test:lint:markdown": "markdownlint README.md",
+    "test:pre-commit": "mocha --reporter progress 'test/**/*.@(ts|js)'",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "pre-commit": [
+    "build",
+    "test:lint",
+    "test:pre-commit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwalton/supertest-fetch.git"
+  },
+  "keywords": [
+    "supertest",
+    "api",
+    "test",
+    "node"
+  ],
+  "author": "Jason Walton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwalton/supertest-fetch/issues"
+  },
+  "homepage": "https://github.com/jwalton/supertest-fetch#readme",
+  "devDependencies": {
+    "@types/chai": "^4.1.3",
+    "@types/chai-as-promised": "^7.1.0",
+    "@types/mocha": "^5.2.0",
+    "@types/node": "^10.0.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "coveralls": "^3.0.0",
+    "markdownlint": "^0.8.1",
+    "markdownlint-cli": "^0.8.1",
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.1",
+    "pre-commit": "^1.2.2",
+    "ts-node": "^6.0.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.3"
+  },
+  "dependencies": {
+    "@types/node-fetch": "^1.6.9",
+    "node-fetch": "^2.1.2"
+  }
+}
