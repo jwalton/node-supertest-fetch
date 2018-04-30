@@ -1,6 +1,6 @@
 {
   "name": "supertest-fetch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Supertest with WHAT-WG fetch like interface.",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
