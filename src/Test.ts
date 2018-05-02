@@ -4,6 +4,18 @@ import * as nodeFetch from 'node-fetch';
 
 import Server from './Server';
 
+const MAX_SHORT_BODY_LENGTH = 80;
+
+async function getShortBody(response: fetch.Response) {
+    const body = await response.text();
+    const firstLine = body.split('\n')[0];
+    if(firstLine.length > MAX_SHORT_BODY_LENGTH) {
+        return firstLine.slice(0, MAX_SHORT_BODY_LENGTH) + '...';
+    } else {
+        return firstLine;
+    }
+}
+
 export default class Test implements PromiseLike<fetch.Response> {
     private _pServer: Promise<Server>;
     private _description: string;
@@ -104,19 +116,30 @@ export default class Test implements PromiseLike<fetch.Response> {
      * @param [statusText] - Expected status text.
      */
     expectStatus(statusCode: number, statusText?: string) {
-        this._result = this._result.then(response => {
-            assert.equal(
-                `${response.status}`,
-                `${statusCode}`,
-                this._should(`have status code ${statusCode}`)
-            );
-            if(typeof statusText === 'string') {
-                assert.strictEqual(
-                    response.statusText,
-                    statusText,
-                    this._should(`have status text ${statusText}`)
-                );
+        this._result = this._result.then(async response => {
+            const expected = (typeof statusText === 'string')
+                ? `${statusCode} - ${statusText}`
+                : `${statusCode}`;
+            const actual = (typeof statusText === 'string')
+                ? `${response.status} - ${response.statusText}`
+                : `${response.status}`;
+
+            if(expected !== actual) {
+                let body;
+                try {
+                    body = ` (body was: ${await getShortBody(response)})`;
+                } catch (err) {
+                    body = '';
+                }
+
+                throw new assert.AssertionError({
+                    message: this._should(`have status code ${expected}${body}`),
+                    expected,
+                    actual,
+                    operator: '==='
+                });
             }
+
             return response;
         });
         return this;
@@ -125,9 +148,9 @@ export default class Test implements PromiseLike<fetch.Response> {
     /**
      * Verify the body of a response.
      *
-     * @param body - The body to verify.  This can be either a string or a JSON
-     *   object.  If an object, this will treat the response like JSON data.
-     *   Passing `null` or `undefined` to expectBody will verify that the
+     * @param body - The body to verify.  This can be either a string, a regex,
+     *   or a JSON object.  If an object, this will treat the response like JSON
+     *   data.  Passing `null` or `undefined` to expectBody will verify that the
      *   response has no content-length or transfer-encoding header.
      */
     expectBody(body: any) {
@@ -138,7 +161,7 @@ export default class Test implements PromiseLike<fetch.Response> {
                     body,
                     this._should(`have expected body`)
                 );
-            } else if(body && body.exec && typeof(body.exec) === 'function') {
+            } else if(body instanceof RegExp) {
                 const regex = body as RegExp;
                 assert(
                     !!regex.exec(await response.text()),
