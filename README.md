@@ -11,7 +11,7 @@ This is a library heavily influenced by Visionmedia's excellent
 of this library are:
 
 * Uses [node-fetch](https://github.com/bitinn/node-fetch) to give you a
-  [WHAT-WG Fetch](https://github.github.io/fetch)-like interface.
+  [WHATWG Fetch](https://github.github.io/fetch)-like interface.
 * Should be instantly familiar to anyone who has used supertest.
 * First class support for promises.
 * Supertest has some weird quirks when used with Typescript becuase of
@@ -28,7 +28,7 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({greeting: "Hello!"}));
 );
 
-// This is a function with an API identical to the WHAT-WG `fetch()` function,
+// This is a function with an API identical to the WHATWG `fetch()` function,
 // except the returned Promise has a bunch of supertest like functions on it.
 //
 // If the server is not listening, then `fetch()` will call `listen()` on the

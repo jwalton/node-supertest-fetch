@@ -138,7 +138,7 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
-        it('should behave like WHAT-WG fetch', async function() {
+        it('should behave like WHATWG fetch', async function() {
             const fetch = makeFetch(this.server);
             const response = await fetch('/hello');
             expect(await response.json()).to.eql({greeting: "Hello!"});
