@@ -29,6 +29,14 @@
       "pre-commit": "npm run precommit:test"
     }
   },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "tslint -c tslint.json -t stylish"
+    ],
+    "test/**/*.ts": [
+      "tslint -c test/tslint.json -t stylish"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jwalton/node-supertest-fetch.git"
@@ -53,6 +61,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.0",
+    "husky": "^1.0.0-rc.2",
     "lint-staged": "^7.0.5",
     "markdownlint": "^0.8.1",
     "markdownlint-cli": "^0.8.1",
