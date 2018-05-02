@@ -1,21 +1,37 @@
 language: node_js
 node_js:
-  - node
+  - 'node'
   - '10'
-  - '9'
   - '8'
-  - '7'
   - '6'
+cache:
+  directories:
+    - ~/.npm
+
 before_install:
   - npm install -g npm
+  - npm install -g nsp
   - npm install -g greenkeeper-lockfile@1
+install:
+  - travis_retry npm install
 before_script:
+  - nsp check
   - greenkeeper-lockfile-update
 after_script:
   # Only the first job will upload the lockfile
   - greenkeeper-lockfile-upload
 after_success:
-  - cat ./coverage/lcov.info | ./node_modules/.bin/coveralls
-env:
-  global:
-    secure: DCtTrmKx5pJgfMOvxL3ZSy1uppsI/dG+LuXZ4f0aZUEcEflLmnSW7JgTrPfMah7WhQy+byiOCp9OKtZ+LgPMbTLXBu77BvPnx+jsp0K5w2ozegwXy+GaCs+fFWvZ76PjtWZaqklQm+b3cpJfliHY+s8TT9y+rHXTDYpd4rVR+SqpQ4km6HlOVCkuXiojSPrlxfq81IHX0fYJefDkR159rQBlPtpuVGIufsYvi2J+u+smk/CTIkvnFDIcXVUcSwYZOHVWKsDHxU77mxXX0ZDu59KmontwmSuLxFdXBUEoK1M+aw/ITVlumzaKx/JFh/qiGUNLFJdOVAhE/PTJwoNWNqpdeM4hnxSa1xYh21q3rO6B2NgemINw5pEadOsvQ0JJ3ifhdPKHSxIiegeFWV1igLDPKWWRAHvOlJRWptfoTFuqdoVJ2xZdQd7tl0SwpniNwfjGGufAMiiB3bJEvSx7jwzU8eJldP7sZ6A2Dvt50q2b3CfejRQikP6glRaGeVJmXDRuZTMELI/nl1dciZT3CAtiCbD9ZJvjcuweBjXFfq3SEBRncRLzFFz9QZnYdoAv+tiITa+HUD1+6rNzvjtJFGoKn3PeGgE7XAMy2XUV2KCF2Jau2+DcZdl4kb04Hm5ChDAwRsgO667ZUBVfcIR8OAZ0e5CbTZBqC4ErZ9khbxs=
+  - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
+
+jobs:
+  include:
+    - stage: release
+      node_js: lts/*
+      before_install:
+        - npm install -g npm
+      install:
+        - travis_retry npm install
+      before_script: skip
+      script: npm run semantic-release
+      after_script: skip
+      after_success: skip

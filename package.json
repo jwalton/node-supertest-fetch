@@ -9,23 +9,26 @@
     "types/**/*"
   ],
   "scripts": {
-    "test": "npm run build && npm run test:lint && npm run test:unittest",
+    "test": "npm run build && npm run lint && npm run test:unittest",
+    "precommit:test": "npm run build && lint-staged && npm run precommit:unittest",
     "build": "tsc",
-    "clean": "rm -rf lib types coverage",
+    "clean": "rm -rf dist coverage",
     "test:unittest": "tsc -p test && nyc mocha 'test/**/*.@(ts|js)'",
-    "test:lint": "npm run test:lint:source && npm run test:lint:markdown && npm run test:lint:tests",
-    "test:lint:source": "tslint -c tslint.json -t stylish 'src/**/*.ts'",
-    "test:lint:tests": "tslint -c test/tslint.json -t stylish 'test/**/*.ts'",
-    "test:lint:markdown": "markdownlint README.md",
-    "test:pre-commit": "mocha --reporter progress 'test/**/*.@(ts|js)'",
+    "precommit:unittest": "tsc -p test && mocha --reporter progress 'test/**/*.@(ts|js)'",
+    "lint": "npm run lint:source && npm run lint:markdown && npm run lint:tests",
+    "lint:source": "tslint -c tslint.json -t stylish 'src/**/*.ts'",
+    "lint:tests": "tslint -c test/tslint.json -t stylish 'test/**/*.ts'",
+    "lint:markdown": "markdownlint src/**/*.md *.md",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "semantic-release": "semantic-release"
   },
-  "pre-commit": [
-    "build",
-    "test:lint",
-    "test:pre-commit"
-  ],
+  "husky": {
+    "hooks": {
+      "commit-msg": "validate-commit-msg",
+      "pre-commit": "npm run precommit:test"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jwalton/node-supertest-fetch.git"
@@ -50,14 +53,16 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.0",
+    "lint-staged": "^7.0.5",
     "markdownlint": "^0.8.1",
     "markdownlint-cli": "^0.8.1",
     "mocha": "^5.1.1",
     "nyc": "^11.7.1",
-    "pre-commit": "^1.2.2",
+    "semantic-release": "^15.2.0",
     "ts-node": "^6.0.1",
     "tslint": "^5.9.1",
-    "typescript": "^2.8.3"
+    "typescript": "^2.8.3",
+    "validate-commit-msg": "^2.14.0"
   },
   "dependencies": {
     "@types/node-fetch": "^1.6.9",
