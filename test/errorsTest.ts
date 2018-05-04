@@ -13,6 +13,8 @@ describe('supertest-fetch errors', function() {
                 if(req.url === '/hello') {
                     res.setHeader('content-type', 'application/json');
                     res.end(JSON.stringify({greeting: "Hello!"}));
+                } else if(req.url === '/hellotext') {
+                    res.end("Hello");
                 } else if(req.url === '/err') {
                     res.setHeader('content-type', req.headers['content-type'] || 'text/plain');
                     res.statusCode = 400;
@@ -52,6 +54,17 @@ describe('supertest-fetch errors', function() {
             expect('should have produced an error').to.not.exist;
         } catch (err) {
             expect(err.message).to.equal('Request "GET /err" should have status code 200');
+        }
+    });
+
+    it('should generate a meaninful error when we are expecting JSON but get back text', async function() {
+        try {
+            await fetch(this.server, '/hellotext')
+                .expectBody({message: 'hello'});
+            expect('should have produced an error').to.not.exist;
+        } catch (err) {
+            expect(err.message).to.equal('Request "GET /hellotext" should have JSON body but ' +
+                'body could not be parsed: Unexpected token H in JSON at position 0');
         }
     });
 });

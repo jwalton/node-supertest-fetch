@@ -148,31 +148,46 @@ export default class Test implements PromiseLike<fetch.Response> {
     /**
      * Verify the body of a response.
      *
-     * @param body - The body to verify.  This can be either a string, a regex,
+     * @param expectedBody - The body to verify.  This can be either a string, a regex,
      *   or a JSON object.  If an object, this will treat the response like JSON
      *   data.  Passing `null` or `undefined` to expectBody will verify that the
      *   response has no content-length or transfer-encoding header.
      */
-    expectBody(body: any) {
+    expectBody(expectedBody: any) {
         this._result = this._result.then(async response => {
-            if(typeof body === 'string') {
+            if(typeof expectedBody === 'string') {
                 assert.strictEqual(
                     await response.text(),
-                    body,
+                    expectedBody,
                     this._should(`have expected body`)
                 );
-            } else if(body instanceof RegExp) {
-                const regex = body as RegExp;
+
+            } else if(expectedBody instanceof RegExp) {
+                const regex = expectedBody as RegExp;
                 assert(
                     !!regex.exec(await response.text()),
                     this._should(`have a body with a value that matches ${regex}`)
                 );
-            } else if(body && typeof body === 'object') {
-                assert.deepEqual(
-                    await response.json(),
-                    body,
+
+            } else if(expectedBody && typeof expectedBody === 'object') {
+                const textBody = await response.text();
+                let jsonBody;
+                try {
+                    jsonBody = JSON.parse(textBody);
+                } catch (err) {
+                    throw new assert.AssertionError({
+                        message: this._should(`have JSON body but body could not be parsed: ${err.message}`),
+                        expected: expectedBody,
+                        actual: textBody,
+                        operator: 'deepStrictEqual'
+                    });
+                }
+                assert.deepStrictEqual(
+                    jsonBody,
+                    expectedBody,
                     this._should(`have expected JSON body`)
                 );
+
             } else {
                 // Expect no body.
                 assert(
