@@ -73,7 +73,7 @@
     "validate-commit-msg": "^2.14.0"
   },
   "dependencies": {
-    "@types/node-fetch": "^2.1.0",
+    "@types/node-fetch": "^2.1.1",
     "node-fetch": "^2.1.2"
   }
 }
