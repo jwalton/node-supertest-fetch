@@ -1,4 +1,4 @@
-import http from 'http';
+import { createServer, Server as httpServer } from 'http';
 import { Express } from 'express';
 import * as nodeFetch from 'node-fetch';
 import Server from './Server';
@@ -36,7 +36,7 @@ export {
  *   has 'exepect' methods on it.
  */
 export default function fetch(
-    server: http.Server,
+    server: httpServer,
     url: string | nodeFetch.Request,
     init?: nodeFetch.RequestInit
 ): Test {
@@ -60,12 +60,12 @@ export default function fetch(
  * @returns - a `fetch(url, options)` function, compatible with WHATWG
  *  fetch, but which returns `Test` objects.
  */
-export function makeFetch(target: http.Server | Express) {
+export function makeFetch(target: httpServer | Express) {
 
     // if we were given an express app
     const server = target && (target as Express).route
-        ? http.createServer(target as Express)
-        : (target as http.Server);
+        ? createServer(target as Express)
+        : (target as httpServer);
 
     if(!server || !server.listen || !server.address || !server.close) {
         throw new Error("Expected server");
