@@ -1,4 +1,5 @@
 import http from 'http';
+import { Express } from 'express';
 import * as nodeFetch from 'node-fetch';
 import Server from './Server';
 import Test from './Test';
@@ -59,7 +60,13 @@ export default function fetch(
  * @returns - a `fetch(url, options)` function, compatible with WHATWG
  *  fetch, but which returns `Test` objects.
  */
-export function makeFetch(server: http.Server) {
+export function makeFetch(target: http.Server | Express) {
+
+    // if we were given an express app
+    const server = target && (target as Express).route
+        ? http.createServer(target as Express)
+        : (target as http.Server);
+
     if(!server || !server.listen || !server.address || !server.close) {
         throw new Error("Expected server");
     }

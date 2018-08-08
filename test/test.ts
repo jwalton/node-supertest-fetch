@@ -2,6 +2,7 @@ import http from 'http';
 import {fetch, makeFetch, Request} from '../src';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import express from 'express';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -173,6 +174,16 @@ describe('supertest-fetch', function() {
                 .expectBody({greeting: "Hello!"});
 
             expect(this.closed, 'should close the server').to.equal(2);
+        });
+
+        it('should handle express apps', async function() {
+            const app = express().get('/hello', (_, res) => res.json({greeting: "Hello!"}));
+
+            const fetch = makeFetch(app);
+
+            await fetch('/hello')
+                .expectStatus(200)
+                .expectBody({greeting: "Hello!"});
         });
 
     });
