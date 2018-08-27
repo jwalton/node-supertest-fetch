@@ -51,6 +51,8 @@ export default function fetch(
     return new Test(pServer, url, init);
 }
 
+export type FetchFunction = (url: string | nodeFetch.Request, init?: nodeFetch.RequestInit | undefined) => Test;
+
 /**
  * Creates a `fetch` function for a server.
  *
@@ -60,7 +62,7 @@ export default function fetch(
  * @returns - a `fetch(url, options)` function, compatible with WHATWG
  *  fetch, but which returns `Test` objects.
  */
-export function makeFetch(target: httpServer | Express) {
+export function makeFetch(target: httpServer | Express): FetchFunction {
 
     // if we were given an express app
     const server = target && (target as Express).route
