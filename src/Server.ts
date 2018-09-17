@@ -1,4 +1,5 @@
 import * as http from 'http';
+import { AddressInfo } from 'net';
 
 export default class Server {
     private readonly _server : http.Server;
@@ -18,6 +19,10 @@ export default class Server {
     static create(server: http.Server) : Promise<Server> {
         return new Promise((resolve, reject) => {
             const address = server.address();
+            if(typeof(address) === 'string') {
+                throw new Error(`Can't use a server listening on a UNIX domain socket: ${address}`);
+            }
+
             if(address !== null) {
                 return resolve(new Server(server, address, false));
             }
@@ -33,7 +38,8 @@ export default class Server {
 
             server.once('listening', () => {
                 server.removeListener('error', errHandler);
-                resolve(new Server(server, server.address(), true));
+                const address = server.address() as AddressInfo;
+                resolve(new Server(server, address, true));
             });
 
             server.listen();
