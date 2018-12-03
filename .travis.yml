@@ -16,7 +16,7 @@ install:
   - travis_retry npm install
 before_script:
   - nsp check
-  - greenkeeper-lockfile-update
+  - GK_LOCK_YARN_OPTS="--ignore-engines" greenkeeper-lockfile-update
 after_script:
   # Only the first job will upload the lockfile
   - greenkeeper-lockfile-upload
