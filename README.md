@@ -28,9 +28,10 @@ import http from 'http';
 import {makeFetch} from 'supertest-fetch';
 
 const server = http.createServer((req, res) => {
-    res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify({greeting: "Hello!"}));
-);
+	res.setHeader('content-type', 'application/json');
+	res.end(JSON.stringify({ greeting: "Hello!" }));
+});
+
 
 // This is a function with an API identical to the WHATWG `fetch()` function,
 // except the returned Promise has a bunch of supertest like functions on it.
