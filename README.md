@@ -28,8 +28,8 @@ import http from 'http';
 import {makeFetch} from 'supertest-fetch';
 
 const server = http.createServer((req, res) => {
-	res.setHeader('content-type', 'application/json');
-	res.end(JSON.stringify({ greeting: "Hello!" }));
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ greeting: "Hello!" }));
 });
 
 
