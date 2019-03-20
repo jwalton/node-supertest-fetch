@@ -1,27 +1,28 @@
-import { createServer, Server as httpServer } from 'http';
 import { Express } from 'express';
+import { createServer, Server as httpServer } from 'http';
 import * as nodeFetch from 'node-fetch';
 import Server from './Server';
 import Test from './Test';
 
-export { Test };
 export {
     Body,
+    BodyInit,
+    HeaderInit,
+    Headers,
     Request,
-    RequestInit,
+    RequestCache,
     RequestContext,
+    RequestCredentials,
+    RequestInfo,
+    RequestInit,
     RequestMode,
     RequestRedirect,
-    RequestCredentials,
-    RequestCache,
-    Headers,
     Response,
-    ResponseType,
     ResponseInit,
-    HeaderInit,
-    BodyInit,
-    RequestInfo
+    ResponseType,
 } from 'node-fetch';
+export { Test };
+export { fetch };
 
 /**
  * Fetch a resource from a server, returns a Test.
@@ -40,18 +41,21 @@ export default function fetch(
     url: string | nodeFetch.Request,
     init?: nodeFetch.RequestInit
 ): Test {
-    if(!server || !server.listen || !server.address || !server.close) {
-        throw new Error("Expected server");
+    if (!server || !server.listen || !server.address || !server.close) {
+        throw new Error('Expected server');
     }
-    if(!url) {
-        throw new Error("Expected url to fetch");
+    if (!url) {
+        throw new Error('Expected url to fetch');
     }
 
     const pServer = Server.create(server);
     return new Test(pServer, url, init);
 }
 
-export type FetchFunction = (url: string | nodeFetch.Request, init?: nodeFetch.RequestInit | undefined) => Test;
+export type FetchFunction = (
+    url: string | nodeFetch.Request,
+    init?: nodeFetch.RequestInit | undefined
+) => Test;
 
 /**
  * Creates a `fetch` function for a server.
@@ -63,23 +67,18 @@ export type FetchFunction = (url: string | nodeFetch.Request, init?: nodeFetch.R
  *  fetch, but which returns `Test` objects.
  */
 export function makeFetch(target: httpServer | Express): FetchFunction {
-
     // if we were given an express app
-    const server = target && (target as Express).route
-        ? createServer(target as Express)
-        : (target as httpServer);
+    const server =
+        target && (target as Express).route
+            ? createServer(target as Express)
+            : (target as httpServer);
 
-    if(!server || !server.listen || !server.address || !server.close) {
-        throw new Error("Expected server");
+    if (!server || !server.listen || !server.address || !server.close) {
+        throw new Error('Expected server');
     }
 
-    return function fetch(
-        url: string | nodeFetch.Request,
-        init?: nodeFetch.RequestInit
-    ) {
+    return function fetch(url: string | nodeFetch.Request, init?: nodeFetch.RequestInit) {
         const pServer = Server.create(server);
         return new Test(pServer, url, init);
     };
 }
-
-export {fetch};

@@ -1,81 +1,83 @@
 {
-  "name": "supertest-fetch",
-  "version": "1.0.1",
-  "description": "Supertest with WHATWG fetch like interface.",
-  "main": "lib/index.js",
-  "types": "types/index.d.ts",
-  "files": [
-    "lib/**/*",
-    "types/**/*"
-  ],
-  "scripts": {
-    "test": "npm run build && npm run lint && npm run test:unittest",
-    "precommit:test": "npm run build && lint-staged && npm run precommit:unittest",
-    "build": "tsc",
-    "clean": "rm -rf dist coverage",
-    "test:unittest": "tsc -p test && nyc mocha 'test/**/*.@(ts|js)'",
-    "precommit:unittest": "tsc -p test && mocha --reporter progress 'test/**/*.@(ts|js)'",
-    "lint": "npm run lint:source && npm run lint:markdown && npm run lint:tests",
-    "lint:source": "tslint -c tslint.json -t stylish 'src/**/*.ts'",
-    "lint:tests": "tslint -c test/tslint.json -t stylish 'test/**/*.ts'",
-    "lint:markdown": "markdownlint src/**/*.md *.md",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm run build && npm test",
-    "semantic-release": "semantic-release"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "validate-commit-msg",
-      "pre-commit": "npm run precommit:test"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.ts": [
-      "tslint -c tslint.json -t stylish"
+    "name": "supertest-fetch",
+    "version": "1.0.1",
+    "description": "Supertest with WHATWG fetch like interface.",
+    "main": "lib/index.js",
+    "types": "types/index.d.ts",
+    "files": [
+        "lib/**/*",
+        "types/**/*"
     ],
-    "test/**/*.ts": [
-      "tslint -c test/tslint.json -t stylish"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jwalton/node-supertest-fetch.git"
-  },
-  "keywords": [
-    "supertest",
-    "api",
-    "test",
-    "node"
-  ],
-  "author": "Jason Walton",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jwalton/node-supertest-fetch/issues"
-  },
-  "homepage": "https://github.com/jwalton/node-supertest-fetch#readme",
-  "devDependencies": {
-    "@types/chai": "^4.1.7",
-    "@types/chai-as-promised": "^7.1.0",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^10.12.26",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "coveralls": "^3.0.2",
-    "express": "^4.16.4",
-    "husky": "^1.3.1",
-    "lint-staged": "^8.1.4",
-    "markdownlint-cli": "^0.13.0",
-    "mocha": "^6.0.0",
-    "nyc": "^13.3.0",
-    "semantic-release": "^15.13.3",
-    "ts-node": "^8.0.3",
-    "tslint": "^5.12.1",
-    "typescript": "^2.9.2",
-    "validate-commit-msg": "^2.14.0"
-  },
-  "dependencies": {
-    "@types/express": "^4.16.1",
-    "@types/node-fetch": "^2.1.6",
-    "node-fetch": "^2.3.0"
-  }
+    "scripts": {
+        "test": "npm run build && npm run lint && npm run test:unittest",
+        "precommit:test": "npm run build && lint-staged && npm run precommit:unittest",
+        "build": "tsc",
+        "clean": "rm -rf dist coverage",
+        "test:unittest": "tsc -p test && nyc mocha 'test/**/*.@(ts|js)'",
+        "precommit:unittest": "tsc -p test && mocha --reporter progress 'test/**/*.@(ts|js)'",
+        "lint": "npm run lint:source && npm run lint:markdown && npm run lint:tests",
+        "lint:source": "tslint -c tslint.json -t stylish 'src/**/*.ts'",
+        "lint:tests": "tslint -c test/tslint.json -t stylish 'test/**/*.ts'",
+        "lint:markdown": "markdownlint src/**/*.md *.md",
+        "prepare": "npm run build",
+        "prepublishOnly": "npm run build && npm test",
+        "semantic-release": "semantic-release"
+    },
+    "husky": {
+        "hooks": {
+            "commit-msg": "validate-commit-msg",
+            "pre-commit": "pretty-quick --staged && npm run precommit:test"
+        }
+    },
+    "lint-staged": {
+        "src/**/*.ts": [
+            "tslint -c tslint.json -t stylish"
+        ],
+        "test/**/*.ts": [
+            "tslint -c test/tslint.json -t stylish"
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jwalton/node-supertest-fetch.git"
+    },
+    "keywords": [
+        "supertest",
+        "api",
+        "test",
+        "node"
+    ],
+    "author": "Jason Walton",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/jwalton/node-supertest-fetch/issues"
+    },
+    "homepage": "https://github.com/jwalton/node-supertest-fetch#readme",
+    "devDependencies": {
+        "@types/chai": "^4.1.7",
+        "@types/chai-as-promised": "^7.1.0",
+        "@types/mocha": "^5.2.6",
+        "@types/node": "^10.12.26",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "coveralls": "^3.0.2",
+        "express": "^4.16.4",
+        "husky": "^1.3.1",
+        "lint-staged": "^8.1.4",
+        "markdownlint-cli": "^0.13.0",
+        "mocha": "^6.0.0",
+        "nyc": "^13.3.0",
+        "prettier": "^1.16.4",
+        "pretty-quick": "^1.10.0",
+        "semantic-release": "^15.13.3",
+        "ts-node": "^8.0.3",
+        "tslint": "^5.12.1",
+        "typescript": "^2.9.2",
+        "validate-commit-msg": "^2.14.0"
+    },
+    "dependencies": {
+        "@types/express": "^4.16.1",
+        "@types/node-fetch": "^2.1.6",
+        "node-fetch": "^2.3.0"
+    }
 }
