@@ -272,8 +272,8 @@ export default class Test implements PromiseLike<fetch.Response> {
      * Tests are 'thennable', so you can treat them like a Promise and get back
      * the WHAT-WG fetch response.
      */
-    then(a: (res: fetch.Response) => any, b: (err: Error) => any) {
-        return this.end().then(a,b);
+    then(onfulfilled?: (res: fetch.Response) => any, onrejected?: (err: Error) => any) {
+        return this.end().then(onfulfilled, onrejected);
     }
 
     private _should(message: string) {
