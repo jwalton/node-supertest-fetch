@@ -7,7 +7,8 @@ import Test from './Test';
 export {
     Body,
     BodyInit,
-    HeaderInit,
+    HeadersInit,
+    HeadersInit as HeaderInit,
     Headers,
     Request,
     RequestCache,
