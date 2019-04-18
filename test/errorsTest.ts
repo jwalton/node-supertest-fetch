@@ -38,7 +38,7 @@ describe('supertest-fetch errors', function() {
             expect('should have produced an error').to.not.exist;
         } catch (err) {
             expect(err.message).to.equal(
-                'Request "GET /err" should have status code 200 (body was: Boom!)'
+                'Request "GET /err" should have status code 200 but was 400 (body was: Boom!)'
             );
             expect(err.expected).to.equal('200');
             expect(err.actual).to.equal('400');
@@ -52,7 +52,9 @@ describe('supertest-fetch errors', function() {
                 .expectStatus(200);
             expect('should have produced an error').to.not.exist;
         } catch (err) {
-            expect(err.message).to.equal('Request "GET /err" should have status code 200');
+            expect(err.message).to.equal(
+                'Request "GET /err" should have status code 200 but was 400'
+            );
         }
     });
 

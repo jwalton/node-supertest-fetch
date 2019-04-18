@@ -126,7 +126,7 @@ export default class Test implements PromiseLike<fetch.Response> {
                 }
 
                 throw new assert.AssertionError({
-                    message: this._should(`have status code ${expected}${body}`),
+                    message: this._should(`have status code ${expected} but was ${actual}${body}`),
                     expected,
                     actual,
                     operator: '===',
