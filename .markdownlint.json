@@ -1,9 +1,8 @@
 {
     "line-length": false,
+    "list-marker-space": false,
     "no-inline-html": {
-      "allowed_elements": [
-        "a"
-      ]
+        "allowed_elements": ["a"]
     },
     "no-trailing-punctuation": {
         "punctuation": ".,;:!"
