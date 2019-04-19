@@ -181,4 +181,12 @@ export default class Test implements PromiseLike<fetch.Response> {
     private _should(message: string) {
         return `Request "${this._description}" should ${message}`;
     }
+
+    /**
+     * Returns the JSON contents of the response.
+     */
+    async json() {
+        const response = await this.end();
+        return await response.json();
+    }
 }

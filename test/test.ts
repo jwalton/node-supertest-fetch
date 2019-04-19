@@ -220,4 +220,23 @@ describe('supertest-fetch', function() {
             this.server.close();
         });
     });
+
+    describe('json convenience function', async function() {
+        it('should return JSON content', async function() {
+            const result = await fetch(this.server, '/hello')
+                .expectStatus(200)
+                .json();
+            expect(result).to.eql({ greeting: 'Hello!' });
+            expect(this.closed, 'should close the server').to.equal(1);
+        });
+
+        it('should not mask errors', async function() {
+            await expect(
+                fetch(this.server, '/hello')
+                    .expectStatus(404)
+                    .json()
+            ).to.be.rejectedWith('Request "GET /hello" should have status code 404');
+            expect(this.closed, 'should close the server').to.equal(1);
+        });
+    });
 });

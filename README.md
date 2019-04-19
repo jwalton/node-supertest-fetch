@@ -11,27 +11,26 @@ A typescript friendly alternative to Supertest, backed by node-fetch
 ## What is it?
 
 This is a library heavily influenced by Visionmedia's excellent
-[supertest](https://github.com/visionmedia/supertest) library.  The advantages
+[supertest](https://github.com/visionmedia/supertest) library. The advantages
 of this library are:
 
-* Uses [node-fetch](https://github.com/bitinn/node-fetch) to give you a
-  [WHATWG Fetch](https://github.github.io/fetch)-like interface.
-* Should be instantly familiar to anyone who has used supertest.
-* First class support for promises.
-* Supertest has some weird quirks when used with Typescript becuase of
-  [@types/superagent](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/12044).
+-   Uses [node-fetch](https://github.com/bitinn/node-fetch) to give you a
+    [WHATWG Fetch](https://github.github.io/fetch)-like interface.
+-   Should be instantly familiar to anyone who has used supertest.
+-   First class support for promises.
+-   Supertest has some weird quirks when used with Typescript becuase of
+    [@types/superagent](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/12044).
 
 ## Example
 
 ```js
 import http from 'http';
-import {makeFetch} from 'supertest-fetch';
+import { makeFetch } from 'supertest-fetch';
 
 const server = http.createServer((req, res) => {
     res.setHeader('content-type', 'application/json');
-    res.end(JSON.stringify({ greeting: "Hello!" }));
+    res.end(JSON.stringify({ greeting: 'Hello!' }));
 });
-
 
 // This is a function with an API identical to the WHATWG `fetch()` function,
 // except the returned Promise has a bunch of supertest like functions on it.
@@ -45,7 +44,7 @@ describe('my server tests', function() {
         await fetch('/hello')
             .expect(200)
             .expect('content-type', 'application/json')
-            .expect({greeting: "Hello!"});
+            .expect({ greeting: 'Hello!' });
     });
 
     it('will work just like fetch if you need to do more advanced things', async function() {
@@ -53,14 +52,14 @@ describe('my server tests', function() {
             .expect(200)
             .expect('content-type', 'application/json');
 
-        expect(await response.json()).to.eql({greeting: "Hello!"});
+        expect(await response.json()).to.eql({ greeting: 'Hello!' });
     });
 
     it('should post data', async function() {
         await fetch('/hello', {
             method: 'post',
             body: '<message>Hello</message>',
-            headers: {'content-type': 'application/xml'}
+            headers: { 'content-type': 'application/xml' },
         });
     });
 });
@@ -74,7 +73,7 @@ Verify response status code and text.
 
 ### .expectHeader(headerName, value)
 
-Verify headerName matches the given value or regex.  If `value` is null,
+Verify headerName matches the given value or regex. If `value` is null,
 verifies that the header is not present.
 
 ### .expectBody(body)
@@ -96,3 +95,21 @@ Supertest friendly alias for `.expectBody(body)`.
 ### .expect(field, value)
 
 Supertest friendly alias for `.expectHeader(field, value)`.
+
+### .json()
+
+Convenience function which returns a Promise which resolves to the JSON content
+of the response. This:
+
+```js
+const result = await fetch('/hello')
+    .expect(200)
+    .json();
+```
+
+is equivalent to:
+
+```js
+const response = await fetch('/hello').expect(200);
+const result = await response.json();
+```
