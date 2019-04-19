@@ -2,23 +2,19 @@ import assert from 'assert';
 import * as fetch from 'node-fetch';
 import * as nodeFetch from 'node-fetch';
 import Server from './Server';
-
-const MAX_SHORT_BODY_LENGTH = 80;
-
-async function getShortBody(response: fetch.Response) {
-    const body = await response.text();
-    const firstLine = body.split('\n')[0];
-    if (firstLine.length > MAX_SHORT_BODY_LENGTH) {
-        return firstLine.slice(0, MAX_SHORT_BODY_LENGTH) + '...';
-    } else {
-        return firstLine;
-    }
-}
+import {
+    Assertion,
+    StatusAssertion,
+    BodyAssertion,
+    HeaderAssertion,
+    AssertionContext,
+} from './Assertions';
 
 export default class Test implements PromiseLike<fetch.Response> {
     private _pServer: Promise<Server>;
     private _description: string;
     private _result: Promise<fetch.Response>;
+    private _assertions: Assertion[] = [];
 
     constructor(
         pServer: Promise<Server>,
@@ -109,32 +105,7 @@ export default class Test implements PromiseLike<fetch.Response> {
      * @param [statusText] - Expected status text.
      */
     expectStatus(statusCode: number, statusText?: string) {
-        this._result = this._result.then(async response => {
-            const expected =
-                typeof statusText === 'string' ? `${statusCode} - ${statusText}` : `${statusCode}`;
-            const actual =
-                typeof statusText === 'string'
-                    ? `${response.status} - ${response.statusText}`
-                    : `${response.status}`;
-
-            if (expected !== actual) {
-                let body;
-                try {
-                    body = ` (body was: ${await getShortBody(response)})`;
-                } catch (err) {
-                    body = '';
-                }
-
-                throw new assert.AssertionError({
-                    message: this._should(`have status code ${expected} but was ${actual}${body}`),
-                    expected,
-                    actual,
-                    operator: '===',
-                });
-            }
-
-            return response;
-        });
+        this._assertions.push(new StatusAssertion(statusCode, statusText));
         return this;
     }
 
@@ -147,53 +118,7 @@ export default class Test implements PromiseLike<fetch.Response> {
      *   response has no content-length or transfer-encoding header.
      */
     expectBody(expectedBody: any) {
-        this._result = this._result.then(async response => {
-            if (typeof expectedBody === 'string') {
-                assert.strictEqual(
-                    await response.text(),
-                    expectedBody,
-                    this._should(`have expected body`)
-                );
-            } else if (expectedBody instanceof RegExp) {
-                const regex = expectedBody as RegExp;
-                assert(
-                    !!regex.exec(await response.text()),
-                    this._should(`have a body with a value that matches ${regex}`)
-                );
-            } else if (expectedBody && typeof expectedBody === 'object') {
-                const textBody = await response.text();
-                let jsonBody;
-                try {
-                    jsonBody = JSON.parse(textBody);
-                } catch (err) {
-                    throw new assert.AssertionError({
-                        message: this._should(
-                            `have JSON body but body could not be parsed: ${err.message}`
-                        ),
-                        expected: expectedBody,
-                        actual: textBody,
-                        operator: 'deepStrictEqual',
-                    });
-                }
-                assert.deepStrictEqual(
-                    jsonBody,
-                    expectedBody,
-                    this._should(`have expected JSON body`)
-                );
-            } else {
-                // Expect no body.
-                assert(
-                    !response.headers.has('content-length'),
-                    this._should(`not have a body, but has a content-length header`)
-                );
-                assert(
-                    !response.headers.has('transfer-encoding'),
-                    this._should(`not have a body, but has a transfer-encoding header`)
-                );
-            }
-
-            return response;
-        });
+        this._assertions.push(new BodyAssertion(expectedBody));
         return this;
     }
 
@@ -205,56 +130,38 @@ export default class Test implements PromiseLike<fetch.Response> {
      *   verify the header is not present.
      */
     expectHeader(name: string, value: string | string[] | number | undefined | RegExp | null) {
-        this._result = this._result.then(async response => {
-            if (value === undefined || value === null) {
-                if (response.headers.has(name)) {
-                    assert.strictEqual(
-                        response.headers.get(name),
-                        undefined,
-                        this._should(`not have header ${name}`)
-                    );
-                }
-            } else {
-                assert(response.headers.has(name), this._should(`have header ${name}`));
-
-                if ((value as RegExp).exec) {
-                    const regex = value as RegExp;
-                    const headerValue = response.headers.get(name);
-                    assert(
-                        headerValue && !!regex.exec(headerValue),
-                        this._should(
-                            `have a header ${name} with a value that matches ${regex} but is ${headerValue}`
-                        )
-                    );
-                } else if (typeof value === 'string' || typeof value === 'number') {
-                    assert.strictEqual(
-                        response.headers.get(name),
-                        `${value}`,
-                        this._should(`have correct header ${name}`)
-                    );
-                } else if (Array.isArray(value)) {
-                    assert.strictEqual(
-                        response.headers.getAll(name),
-                        `${value}`,
-                        this._should(`have correct header ${name}`)
-                    );
-                } else {
-                    throw new Error(`expectHeader expects a string or array of strings`);
-                }
-            }
-
-            return response;
-        });
+        this._assertions.push(new HeaderAssertion(name, value));
         return this;
     }
 
     end() {
+        const expected: any = {};
+        const actual: any = {};
+        const context: AssertionContext = {};
+
         return this._result.then(
-            response =>
-                this._pServer.then(server => {
-                    server.close();
-                    return response;
-                }),
+            async response => {
+                const server = await this._pServer;
+                server.close();
+
+                let message: string | undefined;
+                for (const assertion of this._assertions) {
+                    const assertionMessage = await assertion.execute(
+                        actual,
+                        expected,
+                        response,
+                        context
+                    );
+                    message = message || assertionMessage;
+                }
+                assert.deepStrictEqual(
+                    actual,
+                    expected,
+                    message ? this._should(message) : undefined
+                );
+
+                return response;
+            },
             err =>
                 this._pServer.then(server => {
                     server.close();

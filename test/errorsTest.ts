@@ -40,12 +40,15 @@ describe('supertest-fetch errors', function() {
             expect(err.message).to.equal(
                 'Request "GET /err" should have status code 200 but was 400 (body was: Boom!)'
             );
-            expect(err.expected).to.equal('200');
-            expect(err.actual).to.equal('400');
+            expect(err.expected).to.eql({ status: '200' });
+            expect(err.actual).to.eql({
+                body: 'Boom!\nLong message\n',
+                status: '400',
+            });
         }
     });
 
-    it('should generate an error for a status code with no body if the body has been consumed', async function() {
+    it('should generate an error for a status code, with an expectBody', async function() {
         try {
             await fetch(this.server, '/err')
                 .expectBody(/.*/)
@@ -53,7 +56,7 @@ describe('supertest-fetch errors', function() {
             expect('should have produced an error').to.not.exist;
         } catch (err) {
             expect(err.message).to.equal(
-                'Request "GET /err" should have status code 200 but was 400'
+                'Request "GET /err" should have status code 200 but was 400 (body was: Boom!)'
             );
         }
     });
@@ -65,7 +68,7 @@ describe('supertest-fetch errors', function() {
         } catch (err) {
             expect(err.message).to.equal(
                 'Request "GET /hellotext" should have JSON body but ' +
-                    'body could not be parsed: Unexpected token H in JSON at position 0'
+                    'body could not be parsed: SyntaxError: Unexpected token H in JSON at position 0'
             );
         }
     });
