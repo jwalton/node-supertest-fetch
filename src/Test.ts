@@ -49,10 +49,8 @@ export default class Test implements PromiseLike<fetch.Response> {
                     timeout: url.timeout,
                     compress: url.compress,
                     size: url.size,
-                    agent: url.agent,
                     follow: url.follow,
-                    counter: url.counter,
-                } as nodeFetch.Request);
+                });
                 result = nodeFetch.default(request, init);
             }
             return result;
