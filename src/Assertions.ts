@@ -193,7 +193,7 @@ export class HeaderAssertion implements Assertion {
             if (expected.headers[this._name] !== actual.headers[this._name]) {
                 result = `have no header ${this._name} but has "${actual.headers[this._name]}"`;
             }
-        } else if ((this._value as RegExp).exec) {
+        } else if (typeof this._value === 'object' && 'exec' in this._value) {
             const regex = this._value as RegExp;
             const headerValue = response.headers.get(this._name);
             actual.headers[this._name] = headerValue;
