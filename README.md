@@ -1,7 +1,7 @@
 # supertest-fetch
 
 [![NPM version](https://badge.fury.io/js/supertest-fetch.svg)](https://npmjs.org/package/supertest-fetch)
-[![Build Status](https://travis-ci.org/jwalton/node-supertest-fetch.svg)](https://travis-ci.org/jwalton/node-supertest-fetch)
+![Build Status](https://github.com/jwalton/node-supertest-fetch/workflows/GitHub%20CI/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/jwalton/node-supertest-fetch/badge.svg)](https://coveralls.io/r/jwalton/node-supertest-fetch)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
@@ -38,15 +38,15 @@ const server = http.createServer((req, res) => {
 // server before each fetch, and close it after each fetch.
 const fetch = makeFetch(server);
 
-describe('my server tests', function() {
-    it('should return a response', async function() {
+describe('my server tests', function () {
+    it('should return a response', async function () {
         await fetch('/hello')
             .expect(200)
             .expect('content-type', 'application/json')
             .expect({ greeting: 'Hello!' });
     });
 
-    it('will work just like fetch if you need to do more advanced things', async function() {
+    it('will work just like fetch if you need to do more advanced things', async function () {
         const response = await fetch('/hello')
             .expect(200)
             .expect('content-type', 'application/json');
@@ -54,7 +54,7 @@ describe('my server tests', function() {
         expect(await response.json()).to.eql({ greeting: 'Hello!' });
     });
 
-    it('should post data', async function() {
+    it('should post data', async function () {
         await fetch('/hello', {
             method: 'post',
             body: '<message>Hello</message>',
@@ -101,9 +101,7 @@ Convenience function which returns a Promise which resolves to the JSON content
 of the response. This:
 
 ```js
-const result = await fetch('/hello')
-    .expect(200)
-    .json();
+const result = await fetch('/hello').expect(200).json();
 ```
 
 is equivalent to:
