@@ -68,7 +68,7 @@
     },
     "dependencies": {
         "@types/express": "^4.17.7",
-        "@types/node-fetch": "^2.3.1",
+        "@types/node-fetch": "^3.0.3",
         "node-fetch": "^2.3.0"
     }
 }
