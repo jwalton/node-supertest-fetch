@@ -143,7 +143,9 @@ export class BodyAssertion implements Assertion {
                 }
             } catch (err) {
                 actual.body = textBody;
-                message = `have JSON body but body could not be parsed: ${err.toString()}`;
+                message = `have JSON body but body could not be parsed: ${(
+                    err as Error
+                ).toString()}`;
             }
         } else {
             // Expect no body.
