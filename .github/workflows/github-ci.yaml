@@ -6,7 +6,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                node-versions: [12.x, 14.x]
+                node-versions: [12.x, 14.x, 16.x]
         steps:
             - uses: actions/checkout@v2
             - name: Setup Node ${{ matrix.node-version }}
@@ -29,7 +29,7 @@ jobs:
             - name: Setup Node ${{ matrix.node-version }}
               uses: actions/setup-node@v1
               with:
-                  node-version: 14
+                  node-version: 16
             - run: npm install
             - name: semantic-release
               run: npm run semantic-release
