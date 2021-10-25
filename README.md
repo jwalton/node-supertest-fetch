@@ -72,7 +72,7 @@ Returns a new `fetch` function. This is identical to the WHAT-WG fetch function,
 
 If the `server` passed in is not already listening, each call to `fetch()` will call `listen()` on the server, and close it after each fetch. This will assign a random free port to the server, so you don't need to worry about listening on a well-known port for your tests to work.
 
-If the `server` passed in is an instance of tls.Server, then the returned `fetch` instance will use HTTPS to connect to the server instead of HTTP. Note that it's up to you to appropriately configure the server, supplying a certificate and key, and if you're using a self-signed certificate you'll need to pass an "agent" to the call to `fetch`. See [this example](https://github.com/jwalton/node-supertest-fetch/blob/master/test/https.ts) for details.
+If the `server` passed in is an instance of tls.Server, then the returned `fetch` instance will use HTTPS to connect to the server instead of HTTP. Note that it's up to you to appropriately configure the server, supplying a certificate and key, and if you're using a self-signed certificate you'll need to pass an "agent" to the call to `fetch`. See [this example](https://github.com/jwalton/node-supertest-fetch/blob/master/test/httpsTest.ts) for details.
 
 ### .expectStatus(statusCode[, statusText])
 
