@@ -7,9 +7,9 @@ import Test from './Test';
 export {
     Body,
     BodyInit,
-    HeadersInit,
-    HeadersInit as HeaderInit,
     Headers,
+    HeadersInit as HeaderInit,
+    HeadersInit,
     Request,
     RequestCache,
     RequestContext,
@@ -35,7 +35,7 @@ export { fetch };
  * WHATWG Fetch.  URL should be relative to the server (e.g. '/foo/bar').
  * @param options - Same as WHATWG Fetch.
  * @returns - a Test, which is like a Promise<Response>, but it also
- *   has 'exepect' methods on it.
+ *   has 'expect' methods on it.
  */
 export default function fetch(
     server: httpServer,

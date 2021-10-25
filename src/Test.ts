@@ -34,7 +34,7 @@ export default class Test implements PromiseLike<fetch.Response> {
     }
 
     private _fetchPriv(url: string | nodeFetch.Request, init?: nodeFetch.RequestInit) {
-        return this._pServer.then(server => {
+        return this._pServer.then((server) => {
             let result;
 
             if (typeof url === 'string') {
@@ -138,7 +138,7 @@ export default class Test implements PromiseLike<fetch.Response> {
         const context: AssertionContext = {};
 
         return this._result.then(
-            async response => {
+            async (response) => {
                 const server = await this._pServer;
                 server.close();
 
@@ -160,8 +160,8 @@ export default class Test implements PromiseLike<fetch.Response> {
 
                 return response;
             },
-            err =>
-                this._pServer.then(server => {
+            (err) =>
+                this._pServer.then((server) => {
                     server.close();
                     throw err;
                 })

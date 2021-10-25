@@ -13,7 +13,10 @@ export default class Server {
     ) {
         this._server = server;
         this._startedServer = started;
-        this.url = `http://localhost:${address.port}`;
+
+        // Check if server is an instance of tls.Server.
+        const https = 'getTicketKeys' in (server as any);
+        this.url = `${https ? 'https' : 'http'}://localhost:${address.port}`;
     }
 
     static create(server: http.Server): Promise<Server> {
