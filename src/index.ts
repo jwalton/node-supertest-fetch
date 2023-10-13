@@ -1,4 +1,4 @@
-import { createServer, Server as HttpServer, RequestListener } from 'http';
+import { createServer, Server as HttpServer, RequestListener } from 'node:http';
 import Server from './Server';
 import Test from './Test';
 

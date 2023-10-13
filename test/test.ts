@@ -1,7 +1,7 @@
+import http from 'node:http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import express from 'express';
-import http from 'http';
 import { request, makeRequest } from '../src';
 
 chai.use(chaiAsPromised);

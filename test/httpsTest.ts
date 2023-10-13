@@ -1,15 +1,15 @@
+import https, { Server as HttpsServer } from 'node:https';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import https, { Server } from 'https';
-import { makeRequest } from '../src';
 import pem from 'pem';
+import { makeRequest } from '../src';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('https', function () {
     let keys: pem.CertificateCreationResult;
-    let server: Server;
+    let server: HttpsServer;
     let closed = 0;
 
     beforeEach(async function () {

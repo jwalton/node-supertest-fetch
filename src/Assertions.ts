@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'node:assert';
 
 const MAX_SHORT_BODY_LENGTH = 80;
 

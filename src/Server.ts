@@ -1,14 +1,14 @@
-import * as http from 'http';
-import { AddressInfo } from 'net';
-import { Server as TlsServer } from 'tls';
+import { Server as HttpServer } from 'node:http';
+import { AddressInfo } from 'node:net';
+import { Server as TlsServer } from 'node:tls';
 
 export default class Server {
-    private readonly _server: http.Server;
+    private readonly _server: HttpServer;
     private readonly _startedServer: boolean = false;
     readonly url: string;
 
     private constructor(
-        server: http.Server,
+        server: HttpServer,
         address: { port: number; family: string; address: string },
         started: boolean
     ) {
@@ -19,7 +19,7 @@ export default class Server {
         this.url = `${https ? 'https' : 'http'}://localhost:${address.port}`;
     }
 
-    static create(server: http.Server): Promise<Server> {
+    static create(server: HttpServer): Promise<Server> {
         return new Promise((resolve, reject) => {
             const address = server.address();
             if (typeof address === 'string') {

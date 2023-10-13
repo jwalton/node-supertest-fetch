@@ -1,6 +1,6 @@
+import http from 'node:http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import http from 'http';
 import { request } from '../src';
 
 chai.use(chaiAsPromised);
