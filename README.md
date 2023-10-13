@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/jwalton/node-supertest-fetch/badge.svg)](https://coveralls.io/r/jwalton/node-supertest-fetch)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
-A typescript friendly alternative to Supertest, backed by native node fetch implementation
+A typescript friendly alternative to Supertest. Backed by native node fetch implementation so it requires node 18+ version.
 
 ## What is it?
 
@@ -13,7 +13,7 @@ This is a library heavily influenced by Visionmedia's excellent
 [supertest](https://github.com/visionmedia/supertest) library. The advantages
 of this library are:
 
--   Uses native node [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) implementation.
+-   Uses native node [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) implementation (support since node v18.0.0).
 -   Should be instantly familiar to anyone who has used supertest.
 -   First class support for promises.
 -   Supertest has some weird quirks when used with Typescript becuase of

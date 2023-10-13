@@ -4,6 +4,9 @@
     "description": "Supertest with WHATWG fetch like interface.",
     "main": "lib/index.js",
     "types": "types/index.d.ts",
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "files": [
         "lib/**/*",
         "types/**/*"

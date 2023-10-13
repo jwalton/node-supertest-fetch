@@ -6,7 +6,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                node-versions: ['14', '16', '18', 'lts/*']
+                node-versions: ['18', 'lts/*']
         steps:
             - uses: actions/checkout@v3
             - name: Setup Node ${{ matrix.node-version }}
