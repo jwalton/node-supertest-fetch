@@ -64,10 +64,14 @@ describe('supertest-fetch errors', function () {
             await request(this.server, '/hellotext').expectBody({ message: 'hello' });
             expect('should have produced an error').to.not.exist;
         } catch (err: any) {
-            expect(err.message).to.equal(
+            const node18Message =
                 'Request "GET /hellotext" should have JSON body but ' +
-                    'body could not be parsed: SyntaxError: Unexpected token H in JSON at position 0'
-            );
+                'body could not be parsed: SyntaxError: Unexpected token H in JSON at position 0';
+            const node20Message =
+                'Request "GET /hellotext" should have JSON body but ' +
+                `body could not be parsed: SyntaxError: Unexpected token 'H', "Hello" is not valid JSON`;
+
+            expect(err.message === node18Message || err.message === node20Message).to.be.true;
         }
     });
 });
