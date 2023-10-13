@@ -1,16 +1,15 @@
-import * as fetch from 'node-fetch';
 import assert from 'assert';
 
 const MAX_SHORT_BODY_LENGTH = 80;
 
-async function getBody(response: fetch.Response, context: AssertionContext) {
+async function getBody(response: Response, context: AssertionContext) {
     if (context.body === undefined) {
         context.body = await response.text();
     }
     return context.body;
 }
 
-async function getShortBody(response: fetch.Response, context: AssertionContext) {
+async function getShortBody(response: Response, context: AssertionContext) {
     const body = await getBody(response, context);
     const firstLine = body.split('\n')[0];
     if (firstLine.length > MAX_SHORT_BODY_LENGTH) {
@@ -30,7 +29,7 @@ export interface Assertion {
     execute(
         actual: any,
         expected: any,
-        response: fetch.Response,
+        response: Response,
         context: AssertionContext
     ): Promise<string | undefined> | string | undefined;
 }
@@ -59,7 +58,7 @@ export class StatusAssertion implements Assertion {
         return !('status' in expected) || expected.status === this._code;
     }
 
-    async execute(actual: any, expected: any, response: fetch.Response, context: AssertionContext) {
+    async execute(actual: any, expected: any, response: Response, context: AssertionContext) {
         expected.status =
             typeof this._text === 'string' ? `${this._code} - ${this._text}` : `${this._code}`;
         actual.status =
@@ -107,7 +106,7 @@ export class BodyAssertion implements Assertion {
         return !('body' in expected) || expected.body === this._expectedBody;
     }
 
-    async execute(actual: any, expected: any, response: fetch.Response, context: AssertionContext) {
+    async execute(actual: any, expected: any, response: Response, context: AssertionContext) {
         let message: string | undefined;
 
         if (typeof this._expectedBody === 'string') {
@@ -135,7 +134,7 @@ export class BodyAssertion implements Assertion {
 
             const textBody = await getBody(response, context);
             try {
-                actual.body = JSON.parse(textBody);
+                actual.body = JSON.parse(textBody as string);
                 try {
                     assert.deepStrictEqual(expected.body, actual.body);
                 } catch (err) {
@@ -182,7 +181,7 @@ export class HeaderAssertion implements Assertion {
         return true;
     }
 
-    execute(actual: any, expected: any, response: fetch.Response) {
+    execute(actual: any, expected: any, response: Response) {
         actual.headers = actual.headers || {};
         expected.headers = expected.headers || {};
 

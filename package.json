@@ -1,6 +1,6 @@
 {
     "name": "supertest-fetch",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "description": "Supertest with WHATWG fetch like interface.",
     "main": "lib/index.js",
     "types": "types/index.d.ts",
@@ -49,16 +49,17 @@
     "devDependencies": {
         "@types/chai": "^4.1.7",
         "@types/chai-as-promised": "^7.1.0",
-        "@types/mocha": "^9.0.0",
-        "@types/node": "^18.7.23",
+        "@types/express": "^4.17.19",
+        "@types/mocha": "^10.0.2",
+        "@types/node": "^18.18.5",
         "@types/pem": "^1.9.6",
         "chai": "^4.2.0",
         "chai-as-promised": "^7.1.1",
         "coveralls": "^3.0.2",
-        "express": "^4.16.4",
-        "husky": "^7.0.0",
-        "lint-staged": "^12.3.1",
-        "mocha": "^9.1.1",
+        "express": "^4.18.2",
+        "husky": "^8.0.3",
+        "lint-staged": "^14.0.1",
+        "mocha": "^10.2.0",
         "nyc": "^15.0.0",
         "pem": "^1.14.4",
         "prettier": "^2.0.1",
@@ -66,11 +67,6 @@
         "semantic-release": "^19.0.2",
         "ts-node": "^10.0.0",
         "tslint": "^6.0.0",
-        "typescript": "^4.0.2"
-    },
-    "dependencies": {
-        "@types/express": "^4.17.7",
-        "@types/node-fetch": "^2.3.1",
-        "node-fetch": "^2.3.0"
+        "typescript": "^5.2.2"
     }
 }

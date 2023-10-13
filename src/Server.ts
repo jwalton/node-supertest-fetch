@@ -1,5 +1,6 @@
 import * as http from 'http';
 import { AddressInfo } from 'net';
+import { Server as TlsServer } from 'tls';
 
 export default class Server {
     private readonly _server: http.Server;
@@ -14,8 +15,7 @@ export default class Server {
         this._server = server;
         this._startedServer = started;
 
-        // Check if server is an instance of tls.Server.
-        const https = 'getTicketKeys' in (server as any);
+        const https = server instanceof TlsServer;
         this.url = `${https ? 'https' : 'http'}://localhost:${address.port}`;
     }
 

@@ -1,29 +1,13 @@
-import { Express } from 'express';
-import { createServer, Server as httpServer } from 'http';
-import * as nodeFetch from 'node-fetch';
+import { createServer, Server as HttpServer, RequestListener } from 'http';
 import Server from './Server';
 import Test from './Test';
 
-export {
-    Body,
-    BodyInit,
-    Headers,
-    HeadersInit as HeaderInit,
-    HeadersInit,
-    Request,
-    RequestCache,
-    RequestContext,
-    RequestCredentials,
-    RequestInfo,
-    RequestInit,
-    RequestMode,
-    RequestRedirect,
-    Response,
-    ResponseInit,
-    ResponseType,
-} from 'node-fetch';
 export { Test };
-export { fetch };
+export { request };
+
+export interface IExpressLike extends RequestListener {
+    route<T extends string>(prefix: T): any;
+}
 
 /**
  * Fetch a resource from a server, returns a Test.
@@ -37,10 +21,10 @@ export { fetch };
  * @returns - a Test, which is like a Promise<Response>, but it also
  *   has 'expect' methods on it.
  */
-export default function fetch(
-    server: httpServer,
-    url: string | nodeFetch.Request,
-    init?: nodeFetch.RequestInit
+export default function request(
+    server: HttpServer,
+    url: string | Request,
+    init?: RequestInit
 ): Test {
     if (!server || !server.listen || !server.address || !server.close) {
         throw new Error('Expected server');
@@ -53,32 +37,26 @@ export default function fetch(
     return new Test(pServer, url, init);
 }
 
-export type FetchFunction = (
-    url: string | nodeFetch.Request,
-    init?: nodeFetch.RequestInit | undefined
-) => Test;
+export type FetchFunction = (url: string | Request, init?: RequestInit | undefined) => Test;
 
 /**
- * Creates a `fetch` function for a server.
+ * Creates a `request` function for a server.
  *
  * @param server - The server to fetch from.  If the server is not already
- * listening, th server will be started before each call to `fetch()`, and
+ * listening, th server will be started before each call to `request()`, and
  * closed after each call.
- * @returns - a `fetch(url, options)` function, compatible with WHATWG
+ * @returns - a `request(url, options)` function, compatible with WHATWG
  *  fetch, but which returns `Test` objects.
  */
-export function makeFetch(target: httpServer | Express): FetchFunction {
+export function makeRequest(target: HttpServer | IExpressLike): FetchFunction {
     // if we were given an express app
-    const server =
-        target && (target as Express).route
-            ? createServer(target as Express)
-            : (target as httpServer);
+    const server = target && 'route' in target ? createServer(target) : target;
 
     if (!server || !server.listen || !server.address || !server.close) {
         throw new Error('Expected server');
     }
 
-    return function fetch(url: string | nodeFetch.Request, init?: nodeFetch.RequestInit) {
+    return function request(url: string | Request, init?: RequestInit) {
         const pServer = Server.create(server);
         return new Test(pServer, url, init);
     };
