@@ -1,14 +1,14 @@
+import http from 'node:http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import express from 'express';
-import http from 'http';
-import { fetch, makeFetch, Request } from '../src';
+import { request, makeRequest } from '../src';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe('supertest-fetch', function() {
-    beforeEach(function() {
+describe('supertest-fetch', function () {
+    beforeEach(function () {
         this.server = http.createServer((req, res) => {
             if (req.url === '/hello') {
                 res.setHeader('content-type', 'application/json');
@@ -32,8 +32,8 @@ describe('supertest-fetch', function() {
         };
     });
 
-    it('should verify a JSON request', async function() {
-        await fetch(this.server, '/hello')
+    it('should verify a JSON request', async function () {
+        await request(this.server, '/hello')
             .expectStatus(200)
             .expectHeader('content-type', 'application/json')
             .expectBody({ greeting: 'Hello!' });
@@ -41,8 +41,8 @@ describe('supertest-fetch', function() {
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should work with supertest API', async function() {
-        await fetch(this.server, '/hello')
+    it('should work with supertest API', async function () {
+        await request(this.server, '/hello')
             .expect(200)
             .expect('content-type', 'application/json')
             .expect('content-type', /json/)
@@ -51,40 +51,36 @@ describe('supertest-fetch', function() {
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should work with supertest API expect(body)', async function() {
-        await fetch(this.server, '/hello')
-            .expect({ greeting: 'Hello!' })
-            .end();
+    it('should work with supertest API expect(body)', async function () {
+        await request(this.server, '/hello').expect({ greeting: 'Hello!' }).end();
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should work with supertest API expect(body-regex)', async function() {
-        await fetch(this.server, '/hello')
-            .expect(/Hello/)
-            .end();
+    it('should work with supertest API expect(body-regex)', async function () {
+        await request(this.server, '/hello').expect(/Hello/).end();
 
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should verify a text request', async function() {
-        await fetch(this.server, '/text')
+    it('should verify a text request', async function () {
+        await request(this.server, '/text')
             .expectStatus(200)
             .expectHeader('content-type', null)
             .expectBody('Hello!');
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should not care about header case', async function() {
-        await fetch(this.server, '/hello')
+    it('should not care about header case', async function () {
+        await request(this.server, '/hello')
             .expectStatus(200)
             .expectHeader('Content-Type', 'application/json')
             .expectBody({ greeting: 'Hello!' });
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should fail if status code is incorrect', async function() {
+    it('should fail if status code is incorrect', async function () {
         await expect(
-            fetch(this.server, '/hello')
+            request(this.server, '/hello')
                 .expectStatus(404)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello!' })
@@ -92,9 +88,9 @@ describe('supertest-fetch', function() {
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should fail if header is incorrect', async function() {
+    it('should fail if header is incorrect', async function () {
         await expect(
-            fetch(this.server, '/hello')
+            request(this.server, '/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'text/plain')
                 .expectBody({ greeting: 'Hello!' })
@@ -102,9 +98,9 @@ describe('supertest-fetch', function() {
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should fail if body is incorrect', async function() {
+    it('should fail if body is incorrect', async function () {
         await expect(
-            fetch(this.server, '/hello')
+            request(this.server, '/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello2!' })
@@ -112,24 +108,24 @@ describe('supertest-fetch', function() {
         expect(this.closed, 'should close the server').to.equal(1);
     });
 
-    it('should post data', async function() {
-        const fetch = makeFetch(this.server);
+    it('should post data', async function () {
+        const request = makeRequest(this.server);
         const body = '<hello>world</hello>';
-        const req = new Request('/echo', {
+        const init: RequestInit = {
             method: 'post',
             body,
             headers: { 'content-type': 'application/xml' },
-        });
-        await fetch(req)
+        };
+        await request('/echo', init)
             .expectStatus(200)
             .expectHeader('content-type', 'application/xml')
             .expectBody(body);
     });
 
-    describe('makeFetch', function() {
-        it('should generate a "fetch" function', async function() {
-            const fetch = makeFetch(this.server);
-            await fetch('/hello')
+    describe('makeRequest', function () {
+        it('should generate a "fetch" function', async function () {
+            const request = makeRequest(this.server);
+            await request('/hello')
                 .expect(200)
                 .expect('content-type', 'application/json')
                 .expect({ greeting: 'Hello!' });
@@ -137,17 +133,17 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
-        it('should behave like WHATWG fetch', async function() {
-            const fetch = makeFetch(this.server);
-            const response = await fetch('/hello');
+        it('should behave like WHATWG fetch', async function () {
+            const request = makeRequest(this.server);
+            const response = await request('/hello');
             expect(await response.json()).to.eql({ greeting: 'Hello!' });
 
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
-        it('should mix-and-match', async function() {
-            const fetch = makeFetch(this.server);
-            const response = await fetch('/hello')
+        it('should mix-and-match', async function () {
+            const request = makeRequest(this.server);
+            const response = await request('/hello')
                 .expect(200)
                 .expect('content-type', 'application/json');
 
@@ -156,17 +152,17 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
-        it('should recycle a server', async function() {
-            const fetch = makeFetch(this.server);
+        it('should recycle a server', async function () {
+            const request = makeRequest(this.server);
 
-            await fetch('/hello')
+            await request('/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello!' });
 
             expect(this.closed, 'should close the server').to.equal(1);
 
-            await fetch('/hello')
+            await request('/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello!' });
@@ -174,27 +170,25 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(2);
         });
 
-        it('should handle express apps', async function() {
+        it('should handle express apps', async function () {
             const app = express().get('/hello', (_, res) => res.json({ greeting: 'Hello!' }));
 
-            const fetch = makeFetch(app);
+            const request = makeRequest(app);
 
-            await fetch('/hello')
-                .expectStatus(200)
-                .expectBody({ greeting: 'Hello!' });
+            await request('/hello').expectStatus(200).expectBody({ greeting: 'Hello!' });
         });
     });
 
-    describe('server', function() {
-        it('should recycle a server', async function() {
-            await fetch(this.server, '/hello')
+    describe('server', function () {
+        it('should recycle a server', async function () {
+            await request(this.server, '/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello!' });
 
             expect(this.closed, 'should close the server').to.equal(1);
 
-            await fetch(this.server, '/hello')
+            await request(this.server, '/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello!' });
@@ -202,8 +196,8 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(2);
         });
 
-        it('should close the server', async function() {
-            await fetch(this.server, '/hello')
+        it('should close the server', async function () {
+            await request(this.server, '/hello')
                 .expectStatus(200)
                 .expectHeader('content-type', 'application/json')
                 .expectBody({ greeting: 'Hello!' });
@@ -211,9 +205,9 @@ describe('supertest-fetch', function() {
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
-        it('should not close the server if we start it listening first', async function() {
+        it('should not close the server if we start it listening first', async function () {
             this.server.listen();
-            await expect(fetch(this.server, '/hello').expectStatus(404)).to.be.rejectedWith(
+            await expect(request(this.server, '/hello').expectStatus(404)).to.be.rejectedWith(
                 'Request "GET /hello" should have status code 404'
             );
             expect(this.closed, 'should close the server').to.equal(0);
@@ -221,20 +215,16 @@ describe('supertest-fetch', function() {
         });
     });
 
-    describe('json convenience function', async function() {
-        it('should return JSON content', async function() {
-            const result = await fetch(this.server, '/hello')
-                .expectStatus(200)
-                .json();
+    describe('json convenience function', async function () {
+        it('should return JSON content', async function () {
+            const result = await request(this.server, '/hello').expectStatus(200).json();
             expect(result).to.eql({ greeting: 'Hello!' });
             expect(this.closed, 'should close the server').to.equal(1);
         });
 
-        it('should not mask errors', async function() {
+        it('should not mask errors', async function () {
             await expect(
-                fetch(this.server, '/hello')
-                    .expectStatus(404)
-                    .json()
+                request(this.server, '/hello').expectStatus(404).json()
             ).to.be.rejectedWith('Request "GET /hello" should have status code 404');
             expect(this.closed, 'should close the server').to.equal(1);
         });
