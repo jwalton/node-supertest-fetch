@@ -30,8 +30,8 @@ export default class Server {
                 return resolve(new Server(server, address, false));
             }
 
-            const errHandler = (err: any) => {
-                if (err.code === 'EADDRINUSE') {
+            const errHandler = (err: unknown) => {
+                if (err && typeof err === 'object' && 'code' in err && err.code === 'EADDRINUSE') {
                     reject(new Error('Address in use'));
                 }
             };

@@ -6,6 +6,7 @@ import {
     BodyAssertion,
     HeaderAssertion,
     AssertionContext,
+    HeaderValue,
 } from './Assertions';
 
 export default class Test implements PromiseLike<Response> {
@@ -53,7 +54,7 @@ export default class Test implements PromiseLike<Response> {
      * @param statusCode - The expected status code.
      * @param [body] - The expected body.
      */
-    expect(statusCode: number, body?: any): this;
+    expect(statusCode: number, body?: unknown): this;
 
     /**
      * Verify a header exists.  This is an alias for `expectHeader()`.
@@ -61,7 +62,7 @@ export default class Test implements PromiseLike<Response> {
      * @param header - The header name.
      * @param value - The expected header value.
      */
-    expect(header: string, value: string | string[] | number | RegExp): this;
+    expect(header: string, value: HeaderValue): this;
 
     /**
      * Verify body exists.  This is an alias for `expectBody()`.
@@ -70,15 +71,18 @@ export default class Test implements PromiseLike<Response> {
      *
      * @param value - The expected header value.
      */
-    expect(body: any): this;
+    expect(body: unknown): this;
 
-    expect(a: any, b?: any): this {
+    expect(a: unknown, b?: unknown): this {
         if (typeof a === 'number') {
             this.expectStatus(a);
             if (arguments.length === 2) {
                 this.expectBody(b);
             }
         } else if (typeof a === 'string' && arguments.length === 2) {
+            if (!isHeaderValue(b)) {
+                throw new Error(`Invalid header value: ${b}`);
+            }
             this.expectHeader(a, b);
         } else {
             this.expectBody(a);
@@ -105,7 +109,7 @@ export default class Test implements PromiseLike<Response> {
      *   data.  Passing `null` or `undefined` to expectBody will verify that the
      *   response has no content-length or transfer-encoding header.
      */
-    expectBody(expectedBody: any) {
+    expectBody(expectedBody: unknown) {
         this._assertions.push(new BodyAssertion(expectedBody));
         return this;
     }
@@ -117,14 +121,14 @@ export default class Test implements PromiseLike<Response> {
      * @param value - The value to verify.  If `null` or `undefined`, this will
      *   verify the header is not present.
      */
-    expectHeader(name: string, value: string | string[] | number | undefined | RegExp | null) {
+    expectHeader(name: string, value: HeaderValue) {
         this._assertions.push(new HeaderAssertion(name, value));
         return this;
     }
 
     end() {
-        const expected: any = {};
-        const actual: any = {};
+        const expected: object = {};
+        const actual: object = {};
         const context: AssertionContext = {};
 
         return this._result.then(
@@ -162,7 +166,10 @@ export default class Test implements PromiseLike<Response> {
      * Tests are 'thennable', so you can treat them like a Promise and get back
      * the WHAT-WG fetch response.
      */
-    then(onfulfilled?: (res: Response) => any, onrejected?: (err: Error) => any) {
+    then<TResult1 = Response, TResult2 = never>(
+        onfulfilled?: ((value: Response) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+        onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | undefined | null
+    ): PromiseLike<TResult1 | TResult2> {
         return this.end().then(onfulfilled, onrejected);
     }
 
@@ -177,4 +184,14 @@ export default class Test implements PromiseLike<Response> {
         const response = await this.end();
         return await response.json();
     }
+}
+
+function isHeaderValue(v: unknown): v is HeaderValue {
+    return (
+        v === null ||
+        typeof v === 'string' ||
+        (Array.isArray(v) && v.every((s) => typeof s === 'string')) ||
+        typeof v === 'number' ||
+        v instanceof RegExp
+    );
 }

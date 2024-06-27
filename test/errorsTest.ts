@@ -36,7 +36,8 @@ describe('supertest-fetch errors', function () {
         try {
             await fetch(this.server, '/err').expectStatus(200);
             expect('should have produced an error').to.not.exist;
-        } catch (err: any) {
+        } catch (e: unknown) {
+            const err = e as { message: string, expected: unknown, actual: unknown };
             expect(err.message).to.equal(
                 'Request "GET /err" should have status code 200 but was 400 (body was: Boom!)'
             );
@@ -52,7 +53,8 @@ describe('supertest-fetch errors', function () {
         try {
             await fetch(this.server, '/err').expectBody(/.*/).expectStatus(200);
             expect('should have produced an error').to.not.exist;
-        } catch (err: any) {
+        } catch (e: unknown) {
+            const err = e as { message: string };
             expect(err.message).to.equal(
                 'Request "GET /err" should have status code 200 but was 400 (body was: Boom!)'
             );
@@ -63,7 +65,8 @@ describe('supertest-fetch errors', function () {
         try {
             await fetch(this.server, '/hellotext').expectBody({ message: 'hello' });
             expect('should have produced an error').to.not.exist;
-        } catch (err: any) {
+        } catch (e: unknown) {
+            const err = e as { message: string };
             const node18Message =
                 'Request "GET /hellotext" should have JSON body but ' +
                 'body could not be parsed: SyntaxError: Unexpected token H in JSON at position 0';

@@ -6,7 +6,7 @@ export { Test };
 export { fetch };
 
 export interface IExpressLike extends RequestListener {
-    route<T extends string>(prefix: T): any;
+    route<T extends string>(prefix: T): unknown;
 }
 
 /**

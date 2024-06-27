@@ -19,16 +19,24 @@ async function getShortBody(response: Response, context: AssertionContext) {
     }
 }
 
+export type HeaderValue = string | string[] | number | RegExp | null;
+
+export interface Results {
+    status?: string;
+    body?: string | object;
+    headers?: Record<string, string | string[] | number | null>;
+}
+
 export interface AssertionContext {
     body?: string;
 }
 
 export interface Assertion {
     type: string;
-    canAdd(expected: any): boolean;
+    canAdd(expected: Results): boolean;
     execute(
-        actual: any,
-        expected: any,
+        actual: Results,
+        expected: Results,
         response: Response,
         context: AssertionContext
     ): Promise<string | undefined> | string | undefined;
@@ -54,17 +62,13 @@ export class StatusAssertion implements Assertion {
         this._text = statusText;
     }
 
-    canAdd(expected: any) {
-        return !('status' in expected) || expected.status === this._code;
+    canAdd(expected: Results) {
+        return expected && !('status' in expected) || expected.status === this._status_to_string(this._code, this._text);
     }
 
-    async execute(actual: any, expected: any, response: Response, context: AssertionContext) {
-        expected.status =
-            typeof this._text === 'string' ? `${this._code} - ${this._text}` : `${this._code}`;
-        actual.status =
-            typeof this._text === 'string'
-                ? `${response.status} - ${response.statusText}`
-                : `${response.status}`;
+    async execute(actual: Results, expected: Results, response: Response, context: AssertionContext) {
+        expected.status = this._status_to_string(this._code, this._text);
+        actual.status = this._status_to_string(response.status, response.statusText);
 
         if (expected.status !== actual.status) {
             let body;
@@ -75,11 +79,12 @@ export class StatusAssertion implements Assertion {
             }
 
             if (!('body' in actual)) {
-                actual.body = await getBody(response, context);
+                const body = await getBody(response, context);
+                actual.body = body;
                 const contentType = response.headers.get('content-type') || '';
                 if (contentType.toLowerCase().includes('json')) {
                     try {
-                        actual.body = JSON.parse(actual.body);
+                        actual.body = JSON.parse(body);
                     } catch {
                         // Ignore
                     }
@@ -91,22 +96,26 @@ export class StatusAssertion implements Assertion {
 
         return undefined;
     }
+
+    private _status_to_string(status: number, statusText?: string) {
+        return typeof this._text === 'string' ? `${status} - ${statusText || ''}` : `${status}`;
+    }
 }
 
 export class BodyAssertion implements Assertion {
     type = 'body';
 
-    private _expectedBody: any;
+    private _expectedBody: unknown;
 
-    constructor(expected: any) {
+    constructor(expected: unknown) {
         this._expectedBody = expected;
     }
 
-    canAdd(expected: any) {
+    canAdd(expected: Results) {
         return !('body' in expected) || expected.body === this._expectedBody;
     }
 
-    async execute(actual: any, expected: any, response: Response, context: AssertionContext) {
+    async execute(actual: Results, expected: Results, response: Response, context: AssertionContext) {
         let message: string | undefined;
 
         if (typeof this._expectedBody === 'string') {
@@ -118,12 +127,13 @@ export class BodyAssertion implements Assertion {
             }
         } else if (this._expectedBody instanceof RegExp) {
             const regex = this._expectedBody as RegExp;
-            actual.body = await getBody(response, context);
-            expected.body = !!regex.exec(actual.body)
+            const body = await getBody(response, context);
+            actual.body = body;
+            expected.body = regex.exec(body)
                 ? actual.body
                 : `a body with a value that matches ${regex}`;
 
-            if (!!regex.exec(actual.body)) {
+            if (regex.exec(body)) {
                 expected.body = actual.body;
             } else {
                 expected.body = `a body with a value that matches ${regex}`;
@@ -170,9 +180,9 @@ export class HeaderAssertion implements Assertion {
     type = 'header';
 
     private _name: string;
-    private _value: string | string[] | number | undefined | RegExp | null;
+    private _value: HeaderValue;
 
-    constructor(name: string, value: string | string[] | number | undefined | RegExp | null) {
+    constructor(name: string, value: HeaderValue) {
         this._name = name;
         this._value = value;
     }
@@ -181,7 +191,7 @@ export class HeaderAssertion implements Assertion {
         return true;
     }
 
-    execute(actual: any, expected: any, response: Response) {
+    execute(actual: Results, expected: Results, response: Response) {
         actual.headers = actual.headers || {};
         expected.headers = expected.headers || {};
 
