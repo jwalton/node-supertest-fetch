@@ -1,7 +1,7 @@
 import http from 'node:http';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { request } from '../src';
+import { fetch } from '../src';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -34,7 +34,7 @@ describe('supertest-fetch errors', function () {
 
     it('should generate an error for a status code which includes the first line of the body', async function () {
         try {
-            await request(this.server, '/err').expectStatus(200);
+            await fetch(this.server, '/err').expectStatus(200);
             expect('should have produced an error').to.not.exist;
         } catch (err: any) {
             expect(err.message).to.equal(
@@ -50,7 +50,7 @@ describe('supertest-fetch errors', function () {
 
     it('should generate an error for a status code, with an expectBody', async function () {
         try {
-            await request(this.server, '/err').expectBody(/.*/).expectStatus(200);
+            await fetch(this.server, '/err').expectBody(/.*/).expectStatus(200);
             expect('should have produced an error').to.not.exist;
         } catch (err: any) {
             expect(err.message).to.equal(
@@ -61,7 +61,7 @@ describe('supertest-fetch errors', function () {
 
     it('should generate a meaninful error when we are expecting JSON but get back text', async function () {
         try {
-            await request(this.server, '/hellotext').expectBody({ message: 'hello' });
+            await fetch(this.server, '/hellotext').expectBody({ message: 'hello' });
             expect('should have produced an error').to.not.exist;
         } catch (err: any) {
             const node18Message =

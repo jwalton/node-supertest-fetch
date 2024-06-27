@@ -2,7 +2,7 @@ import https, { Server as HttpsServer } from 'node:https';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import pem from 'pem';
-import { makeRequest } from '../src';
+import { makeFetch } from '../src';
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -53,8 +53,8 @@ describe('https', function () {
     });
 
     it('should verify a JSON request over HTTPS', async function () {
-        const request = makeRequest(server);
-        await request('/hello')
+        const fetch = makeFetch(server);
+        await fetch('/hello')
             .expectStatus(200)
             .expectHeader('content-type', 'application/json')
             .expectBody({ greeting: 'Hello!' });

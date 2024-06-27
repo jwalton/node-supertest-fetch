@@ -134,7 +134,7 @@ export class BodyAssertion implements Assertion {
 
             const textBody = await getBody(response, context);
             try {
-                actual.body = JSON.parse(textBody as string);
+                actual.body = JSON.parse(textBody);
                 try {
                     assert.deepStrictEqual(expected.body, actual.body);
                 } catch (err) {
