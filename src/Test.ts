@@ -1,6 +1,4 @@
-import assert from 'assert';
-import * as fetch from 'node-fetch';
-import * as nodeFetch from 'node-fetch';
+import assert from 'node:assert';
 import Server from './Server';
 import {
     Assertion,
@@ -10,17 +8,13 @@ import {
     AssertionContext,
 } from './Assertions';
 
-export default class Test implements PromiseLike<fetch.Response> {
+export default class Test implements PromiseLike<Response> {
     private _pServer: Promise<Server>;
     private _description: string;
-    private _result: Promise<fetch.Response>;
+    private _result: Promise<Response>;
     private _assertions: Assertion[] = [];
 
-    constructor(
-        pServer: Promise<Server>,
-        url: string | nodeFetch.Request,
-        init?: nodeFetch.RequestInit
-    ) {
+    constructor(pServer: Promise<Server>, url: string | Request, init?: RequestInit) {
         this._pServer = pServer;
         if (typeof url === 'string') {
             const method = ((init && init.method) || 'get').toUpperCase();
@@ -33,25 +27,21 @@ export default class Test implements PromiseLike<fetch.Response> {
         this._result = this._fetchPriv(url, init);
     }
 
-    private _fetchPriv(url: string | nodeFetch.Request, init?: nodeFetch.RequestInit) {
+    private _fetchPriv(url: string | Request, init?: RequestInit) {
         return this._pServer.then((server) => {
-            let result;
+            let result: Promise<Response>;
 
             if (typeof url === 'string') {
                 const requestUrl = server.url + url;
-                result = nodeFetch.default(requestUrl, init);
+                result = fetch(requestUrl, init);
             } else {
-                const request = new nodeFetch.Request(server.url + url.url, {
+                const request = new Request(server.url + url.url, {
                     method: url.method,
                     headers: url.headers,
                     body: url.body,
                     redirect: url.redirect,
-                    timeout: url.timeout,
-                    compress: url.compress,
-                    size: url.size,
-                    follow: url.follow,
                 });
-                result = nodeFetch.default(request, init);
+                result = fetch(request, init);
             }
             return result;
         });
@@ -172,7 +162,7 @@ export default class Test implements PromiseLike<fetch.Response> {
      * Tests are 'thennable', so you can treat them like a Promise and get back
      * the WHAT-WG fetch response.
      */
-    then(onfulfilled?: (res: fetch.Response) => any, onrejected?: (err: Error) => any) {
+    then(onfulfilled?: (res: Response) => any, onrejected?: (err: Error) => any) {
         return this.end().then(onfulfilled, onrejected);
     }
 
