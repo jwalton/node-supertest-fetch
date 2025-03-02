@@ -16,7 +16,7 @@ of this library are:
 -   Uses native node [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) implementation (support since node v18.0.0).
 -   Should be instantly familiar to anyone who has used supertest.
 -   First class support for promises.
--   Supertest has some weird quirks when used with Typescript becuase of
+-   Supertest has some weird quirks when used with Typescript because of
     [@types/superagent](https://github.com/DefinitelyTyped/DefinitelyTyped/issues/12044).
 
 ## Example
